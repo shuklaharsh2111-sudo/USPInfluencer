@@ -3,6 +3,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import influencerRoutes from './routes/influencerRoutes.js';
+import youtubeRoutes from './routes/youtubeRoutes.js';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -27,6 +28,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/influencers', influencerRoutes);
+app.use('/api/youtube', youtubeRoutes);
 
 app.use(express.static(frontendPath));
 
@@ -52,6 +54,10 @@ const startServer = async () => {
   try {
     if (!process.env.MONGO_URI) {
       throw new Error('MONGO_URI is missing in environment variables.');
+    }
+
+    if (!process.env.YOUTUBE_API_KEY) {
+      console.warn('WARNING: YOUTUBE_API_KEY is empty - YouTube suggestions and channel stats will not work.');
     }
 
     await mongoose.connect(process.env.MONGO_URI);
