@@ -1,13 +1,11 @@
-
 import mongoose from 'mongoose';
-
 const influencerSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
   channels: {
     type: [{ type: String, enum: ['youtube', 'instagram'] }],
     required: true,
     validate: {
-      validator: (value) => value.length > 0,
+      validator: value => value.length > 0,
       message: 'Select at least one channel'
     }
   },
@@ -32,7 +30,16 @@ const influencerSchema = new mongoose.Schema({
   engagement: { type: Number, required: true, min: 0, max: 100 },
   contact: { type: String, required: true, trim: true },
   email: { type: String, required: true, trim: true, lowercase: true },
-  managementAgency: { type: String, required: true, trim: true }
+  managementAgency: { type: String, trim: true, default: '' },
+  collaborationType: {
+    type: String,
+    enum: ['paid', 'unpaid'],
+    required: true
+  },
+  collaborationPrice: {
+    type: Number,
+    min: 0,
+    default: null
+  }
 }, { timestamps: true });
-
 export default mongoose.model('Influencer', influencerSchema);
