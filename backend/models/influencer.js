@@ -11,6 +11,18 @@ const influencerSchema = new mongoose.Schema({
   },
   youtubeLink: { type: String, trim: true, default: '' },
   instagramLink: { type: String, trim: true, default: '' },
+  youtubeStats: {
+    channelId: { type: String, default: '' },
+    title: { type: String, default: '' },
+    handle: { type: String, default: '' },
+    thumbnail: { type: String, default: '' },
+    subscribers: { type: Number, default: null },
+    totalViews: { type: Number, default: 0 },
+    videoCount: { type: Number, default: 0 },
+    avgViews: { type: Number, default: 0 },
+    engagement: { type: Number, default: 0 },
+    fetchedAt: { type: Date }
+  },
   category: { type: String, required: true, trim: true },
   location: { type: String, required: true, trim: true },
   followers: { type: Number, required: true, min: 0 },

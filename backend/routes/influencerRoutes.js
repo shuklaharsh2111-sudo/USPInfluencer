@@ -15,6 +15,7 @@ router.post('/', async (req, res) => {
     const {
       name, channels, youtubeLink, instagramLink,
       category, location, followers, avgReelViews,
+      engagement, contact, email, managementAgency, youtubeStats
       engagement, contact, email,
       collaborationType, collaborationPrice, managementAgency
     } = req.body;
@@ -60,6 +61,21 @@ router.post('/', async (req, res) => {
       channels,
       youtubeLink: channels.includes('youtube') ? youtubeLink : '',
       instagramLink: channels.includes('instagram') ? instagramLink : '',
+      category, location, followers: Number(followers),
+      avgReelViews: Number(avgReelViews), engagement: Number(engagement),
+      contact, email, managementAgency,
+      youtubeStats: channels.includes('youtube') && youtubeStats?.channelId ? {
+        channelId: String(youtubeStats.channelId),
+        title: String(youtubeStats.title || ''),
+        handle: String(youtubeStats.handle || ''),
+        thumbnail: String(youtubeStats.thumbnail || ''),
+        subscribers: Number.isFinite(Number(youtubeStats.subscribers)) ? Number(youtubeStats.subscribers) : null,
+        totalViews: Number(youtubeStats.totalViews) || 0,
+        videoCount: Number(youtubeStats.videoCount) || 0,
+        avgViews: Number(youtubeStats.avgViews) || 0,
+        engagement: Number(youtubeStats.engagement) || 0,
+        fetchedAt: youtubeStats.fetchedAt ? new Date(youtubeStats.fetchedAt) : new Date()
+      } : undefined
       category,
       location,
       followers: Number(followers),
@@ -84,6 +100,23 @@ router.post('/', async (req, res) => {
     return res.status(500).json({ message: 'Server error while registering influencer.' });
   }
 });
+
+router.get('/suggest', async (req, res) => {
+  try {
+    const q = String(req.query.q || '').trim();
+    if (q.length < 2) return res.json({ success: true, results: [] });
+    const safe = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const results = await Influencer.find({ name: { $regex: safe, $options: 'i' } })
+      .select('name category location')
+      .limit(5)
+      .lean();
+    res.json({ success: true, results });
+  } catch (error) {
+    console.error('Suggest error:', error);
+    res.status(500).json({ message: 'Unable to fetch suggestions.' });
+  }
+});
+
 router.get('/', async (req, res) => {
   try {
     const influencers = await Influencer.find().sort({ createdAt: -1 });

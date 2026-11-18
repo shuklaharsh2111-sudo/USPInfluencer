@@ -1,3 +1,5 @@
+
+import { useEffect, useRef, useState } from 'react';
 import { useState } from 'react';
 import api from './services/api';
 import './App.css';
@@ -50,15 +52,140 @@ const initialForm = {
   collaborationPrice: '',
   managementAgency: ''
 };
+
+const isLinkLike = (value) =>
+  /(youtube\.com\/(@|channel\/|user\/|c\/))|^@[\w.-]+$|^UC[\w-]{22}$/i.test(value.trim());
+
 function App() {
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [ytChannel, setYtChannel] = useState(null);
+  const [ytLoading, setYtLoading] = useState(false);
+  const [ytError, setYtError] = useState('');
+  const [nameHints, setNameHints] = useState({ youtube: [], existing: [] });
+  const [hintsOpen, setHintsOpen] = useState(false);
+  const [hintsLoading, setHintsLoading] = useState(false);
+  const [hintError, setHintError] = useState('');
+  const nameBoxRef = useRef(null);
+  const lastFetchedLink = useRef('');
+
+  // Suggest channels while typing a name/username in the YouTube field (debounced)
+  useEffect(() => {
+    const q = form.youtubeLink.trim();
+    if (!form.channels.includes('youtube') || q.length < 3 || isLinkLike(q)) {
+      setNameHints({ youtube: [], existing: [] });
+      setHintError('');
+      setHintsLoading(false);
+      setHintsOpen(false);
+      return;
+    }
+    let cancelled = false;
+    setHintsLoading(true);
+    const timer = setTimeout(async () => {
+      const [yt, ex] = await Promise.allSettled([api.searchYoutube(q), api.suggestInfluencers(q)]);
+      if (cancelled) return;
+      setHintError(yt.status === 'rejected' ? (yt.reason?.message || 'YouTube search failed.') : '');
+      setNameHints({
+        youtube: yt.status === 'fulfilled' ? yt.value.results : [],
+        existing: ex.status === 'fulfilled' ? ex.value.results : []
+      });
+      setHintsLoading(false);
+      setHintsOpen(true);
+    }, 450);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [form.youtubeLink, form.channels]);
+
+  // Auto-load channel stats when a YouTube link is entered
+  useEffect(() => {
+    const link = form.youtubeLink.trim();
+    if (!form.channels.includes('youtube')) return;
+    if (!isLinkLike(link)) return;
+    if (link === lastFetchedLink.current) return;
+    const timer = setTimeout(() => fetchYoutube(link), 700);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.youtubeLink, form.channels]);
+
+  useEffect(() => {
+    const close = (e) => {
+      if (nameBoxRef.current && !nameBoxRef.current.contains(e.target)) setHintsOpen(false);
+    };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, []);
+
   const updateField = (e) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
+    if (name === 'youtubeLink') {
+      setYtChannel(null);
+      setYtError('');
+      lastFetchedLink.current = '';
+    }
+  };
+
+  const formatNumber = (n) => (n === null || n === undefined ? 'Hidden' : new Intl.NumberFormat('en-IN', { notation: 'compact', maximumFractionDigits: 1 }).format(n));
+
+  const fetchYoutube = async (urlOverride) => {
+    const link = (typeof urlOverride === 'string' ? urlOverride : form.youtubeLink).trim();
+    if (!link) {
+      setYtError('Paste a YouTube channel link first.');
+      return;
+    }
+    lastFetchedLink.current = link;
+    setYtLoading(true);
+    setYtError('');
+    setYtChannel(null);
+    try {
+      const { channel } = await api.getYoutubeChannel(link);
+      setYtChannel(channel);
+      // Only fill what is still empty so manual edits are never overwritten
+      setForm(prev => ({
+        ...prev,
+        name: prev.name || channel.title,
+        followers: prev.followers !== '' ? prev.followers : (channel.subscribers ?? ''),
+        avgReelViews: prev.avgReelViews !== '' ? prev.avgReelViews : channel.avgViews,
+        engagement: prev.engagement !== '' ? prev.engagement : channel.engagement,
+        location: prev.location || (cities.includes(channel.country) ? channel.country : prev.location)
+      }));
+    } catch (error) {
+      setYtError(error.message || 'Could not fetch this channel.');
+    } finally {
+      setYtLoading(false);
+    }
+  };
+
+  const pickYoutubeHint = (hint) => {
+    const url = `https://www.youtube.com/channel/${hint.channelId}`;
+    setHintsOpen(false);
+    setForm(prev => ({
+      ...prev,
+      name: prev.name || hint.title,
+      youtubeLink: url,
+      channels: prev.channels.includes('youtube') ? prev.channels : [...prev.channels, 'youtube']
+    }));
+    fetchYoutube(url);
+  };
+
+  const applyYoutubeStats = () => {
+    if (!ytChannel) return;
+    setForm(prev => ({
+      ...prev,
+      followers: ytChannel.subscribers ?? prev.followers,
+      avgReelViews: ytChannel.avgViews,
+      engagement: ytChannel.engagement
+    }));
   };
   const toggleChannel = (channel) => {
+    if (channel === 'youtube') {
+      setYtChannel(null);
+      setYtError('');
+      lastFetchedLink.current = '';
+    }
     setForm(prev => ({
       ...prev,
       channels: prev.channels.includes(channel)
@@ -77,6 +204,12 @@ function App() {
       setMessage({ type: 'error', text: 'Please enter the YouTube profile link.' });
       return;
     }
+
+    if (form.channels.includes('youtube') && !/^https?:\/\//i.test(form.youtubeLink.trim())) {
+      setMessage({ type: 'error', text: 'Pick a channel from the suggestions or paste the full YouTube link.' });
+      return;
+    }
+
     if (form.channels.includes('instagram') && !form.instagramLink.trim()) {
       setMessage({ type: 'error', text: 'Please enter the Instagram profile link.' });
       return;
@@ -95,9 +228,13 @@ function App() {
     }
     setLoading(true);
     try {
-      const result = await api.createInfluencer(form);
+      const payload = form.channels.includes('youtube') && ytChannel
+        ? { ...form, youtubeStats: ytChannel }
+        : form;
+      const result = await api.createInfluencer(payload);
       setMessage({ type: 'success', text: result.message || 'Influencer registered successfully!' });
       setForm(initialForm);
+      setYtChannel(null);
     } catch (error) {
       setMessage({ type: 'error', text: error.message || 'Registration failed. Please try again.' });
     } finally {
@@ -144,6 +281,17 @@ function App() {
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label htmlFor="name">Full Name <span>*</span></label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                placeholder="Enter influencer's full name"
+                value={form.name}
+                onChange={updateField}
+                autoComplete="off"
+                required
+                maxLength={100}
+              />
               <input id="name" name="name" type="text" placeholder="Enter influencer's full name" value={form.name} onChange={updateField} required maxLength={100} />
             </div>
             <div className="form-group">
@@ -165,12 +313,108 @@ function App() {
               </div>
             </div>
             {form.channels.includes('youtube') && (
-              <div className="form-group conditional-field">
+              <div className="form-group conditional-field name-field" ref={nameBoxRef}>
                 <label htmlFor="youtubeLink">YouTube Profile Link <span>*</span></label>
                 <div className="input-with-icon">
                   <span>▶</span>
+                  <input
+                    id="youtubeLink"
+                    name="youtubeLink"
+                    type="text"
+                    autoComplete="off"
+                    placeholder="Type a channel name, or paste a link (youtube.com/@username)"
+                    value={form.youtubeLink}
+                    onChange={updateField}
+                    required
+                  />
+                  {ytLoading && <span className="button-spinner small link-spinner"></span>}
+                </div>
+                {hintsLoading && <span className="hint-loading">Searching…</span>}
+              {hintsOpen && (
+                <div className="hint-menu" role="listbox">
+                  {hintError && (
+                    <div className="hint-note hint-note-error">YouTube suggestions unavailable: {hintError}</div>
+                  )}
+                  {!hintError && nameHints.youtube.length === 0 && nameHints.existing.length === 0 && (
+                    <div className="hint-note">No matching channels found. Keep typing or enter the name manually.</div>
+                  )}
+                  {nameHints.existing.length > 0 && (
+                    <>
+                      <div className="hint-title">Already registered</div>
+                      {nameHints.existing.map(item => (
+                        <div key={item._id} className="hint-item hint-existing">
+                          <span className="hint-dot"></span>
+                          <span className="hint-text">
+                            <strong>{item.name}</strong>
+                            <small>{[item.category, item.location].filter(Boolean).join(' · ')}</small>
+                          </span>
+                        </div>
+                      ))}
+                    </>
+                  )}
+                  {nameHints.youtube.length > 0 && (
+                    <>
+                      <div className="hint-title">YouTube channels</div>
+                      {nameHints.youtube.map(item => (
+                        <button
+                          type="button"
+                          key={item.channelId}
+                          className="hint-item"
+                          role="option"
+                          onClick={() => pickYoutubeHint(item)}
+                        >
+                          {item.thumbnail
+                            ? <img src={item.thumbnail} alt="" className="hint-avatar" />
+                            : <span className="hint-dot"></span>}
+                          <span className="hint-text">
+                            <strong>{item.title}</strong>
+                            <small>
+                              {item.subscribers !== null && item.subscribers !== undefined ? `${formatNumber(item.subscribers)} subscribers` : 'YouTube channel'}
+                              {item.description ? ` · ${item.description}` : ''}
+                            </small>
+                          </span>
+                          <span className="hint-pick">Use</span>
+                        </button>
+                      ))}
+                    </>
+                  )}
                   <input id="youtubeLink" name="youtubeLink" type="url" placeholder="https://youtube.com/@username" value={form.youtubeLink} onChange={updateField} required />
                 </div>
+              )}
+                <small className="input-note">Type a name to see channel suggestions, or paste a link. Stats load automatically.</small>
+
+                {ytError && <div className="form-alert error inline-alert" role="alert"><span>!</span>{ytError}</div>}
+
+                {ytChannel && (
+                  <div className="yt-preview">
+                    <div className="yt-head">
+                      {ytChannel.thumbnail && <img src={ytChannel.thumbnail} alt="" className="yt-avatar" />}
+                      <div className="yt-title">
+                        <strong>{ytChannel.title}</strong>
+                        <small>{ytChannel.handle || ytChannel.channelId}</small>
+                      </div>
+                      <button type="button" className="yt-apply" onClick={applyYoutubeStats}>Use these stats</button>
+                    </div>
+                    <div className="yt-stats">
+                      <div><b>{formatNumber(ytChannel.subscribers)}</b><span>Subscribers</span></div>
+                      <div><b>{formatNumber(ytChannel.totalViews)}</b><span>Total views</span></div>
+                      <div><b>{formatNumber(ytChannel.videoCount)}</b><span>Videos</span></div>
+                      <div><b>{formatNumber(ytChannel.avgViews)}</b><span>Avg views (last 10)</span></div>
+                      <div><b>{ytChannel.engagement}%</b><span>Engagement</span></div>
+                    </div>
+                    {ytChannel.recentVideos?.length > 0 && (
+                      <div className="yt-videos">
+                        {ytChannel.recentVideos.map(v => (
+                          <a key={v.id} href={`https://www.youtube.com/watch?v=${v.id}`} target="_blank" rel="noreferrer" className="yt-video">
+                            {v.thumbnail && <img src={v.thumbnail} alt="" />}
+                            <span>{v.title}</span>
+                            <small>{formatNumber(v.views)} views</small>
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
             {form.channels.includes('instagram') && (
