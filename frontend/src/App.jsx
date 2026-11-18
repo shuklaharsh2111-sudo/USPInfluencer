@@ -1,6 +1,5 @@
 
 import { useEffect, useRef, useState } from 'react';
-import { useState } from 'react';
 import api from './services/api';
 import './App.css';
 const cities = [
@@ -292,7 +291,6 @@ function App() {
                 required
                 maxLength={100}
               />
-              <input id="name" name="name" type="text" placeholder="Enter influencer's full name" value={form.name} onChange={updateField} required maxLength={100} />
             </div>
             <div className="form-group">
               <label>Social Media Channels <span>*</span></label>
@@ -378,7 +376,6 @@ function App() {
                       ))}
                     </>
                   )}
-                  <input id="youtubeLink" name="youtubeLink" type="url" placeholder="https://youtube.com/@username" value={form.youtubeLink} onChange={updateField} required />
                 </div>
               )}
                 <small className="input-note">Type a name to see channel suggestions, or paste a link. Stats load automatically.</small>
@@ -460,15 +457,15 @@ function App() {
             <div className="form-divider"><span>COLLABORATION DETAILS</span></div>
             <div className="form-group">
               <label>Collaboration Type <span>*</span></label>
-              <p className="field-hint">Select the creator's preferred collaboration arrangement.</p>
+              <p className="field-hint">Choose how this creator prefers to collaborate.</p>
               <div className="channel-options">
-                <label className={`channel-card collaboration-card ${form.collaborationType === 'paid' ? 'selected' : ''}`}>
+                <label className={`channel-card collaboration-card paid-card ${form.collaborationType === 'paid' ? 'selected' : ''}`}>
                   <input type="radio" name="collaborationType" value="paid" checked={form.collaborationType === 'paid'} onChange={updateField} />
                   <span className="channel-symbol paid-symbol">₹</span>
                   <span className="channel-info"><strong>Paid Collaboration</strong><small>Creator charges a fee</small></span>
                   <span className="channel-check">{form.collaborationType === 'paid' ? '✓' : '+'}</span>
                 </label>
-                <label className={`channel-card collaboration-card ${form.collaborationType === 'unpaid' ? 'selected' : ''}`}>
+                <label className={`channel-card collaboration-card unpaid-card ${form.collaborationType === 'unpaid' ? 'selected' : ''}`}>
                   <input type="radio" name="collaborationType" value="unpaid" checked={form.collaborationType === 'unpaid'} onChange={updateField} />
                   <span className="channel-symbol unpaid-symbol">✓</span>
                   <span className="channel-info"><strong>Unpaid Collaboration</strong><small>Barter / Free promotion</small></span>
@@ -493,7 +490,11 @@ function App() {
                 <input id="contact" name="contact" type="tel" placeholder="Enter phone number" value={form.contact} onChange={updateField} required />
               </div>
               <div className="form-group">
-                <label htmlFor="managementAgency">Management Agency Name <span className="optional-label">(Optional)</span></label>
+                <label htmlFor="email">Email Address <span>*</span></label>
+                <input id="email" name="email" type="email" placeholder="creator@email.com" value={form.email} onChange={updateField} required />
+              </div>
+              <div className="form-group full-width">
+                <label htmlFor="managementAgency">Management Agency Name <span className="optional-label">Optional</span></label>
                 <input
                   id="managementAgency"
                   name="managementAgency"
@@ -503,10 +504,6 @@ function App() {
                   onChange={updateField}
                   maxLength={150}
                 />
-              </div>
-              <div className="form-group">
-                <label htmlFor="email">Email Address <span>*</span></label>
-                <input id="email" name="email" type="email" placeholder="creator@email.com" value={form.email} onChange={updateField} required />
               </div>
             </div>
             {message.text && (

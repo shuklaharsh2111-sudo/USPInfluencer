@@ -15,9 +15,9 @@ router.post('/', async (req, res) => {
     const {
       name, channels, youtubeLink, instagramLink,
       category, location, followers, avgReelViews,
-      engagement, contact, email, managementAgency, youtubeStats
       engagement, contact, email,
-      collaborationType, collaborationPrice, managementAgency
+      collaborationType, collaborationPrice, managementAgency,
+      youtubeStats
     } = req.body;
     if (!name?.trim() || !category?.trim() || !location?.trim() ||
       !contact?.trim() || !email?.trim()) {
@@ -63,7 +63,11 @@ router.post('/', async (req, res) => {
       instagramLink: channels.includes('instagram') ? instagramLink : '',
       category, location, followers: Number(followers),
       avgReelViews: Number(avgReelViews), engagement: Number(engagement),
-      contact, email, managementAgency,
+      contact,
+      email,
+      managementAgency: managementAgency?.trim() || '',
+      collaborationType,
+      collaborationPrice: collaborationType === 'paid' ? Number(collaborationPrice) : null,
       youtubeStats: channels.includes('youtube') && youtubeStats?.channelId ? {
         channelId: String(youtubeStats.channelId),
         title: String(youtubeStats.title || ''),
@@ -76,16 +80,6 @@ router.post('/', async (req, res) => {
         engagement: Number(youtubeStats.engagement) || 0,
         fetchedAt: youtubeStats.fetchedAt ? new Date(youtubeStats.fetchedAt) : new Date()
       } : undefined
-      category,
-      location,
-      followers: Number(followers),
-      avgReelViews: Number(avgReelViews),
-      engagement: Number(engagement),
-      contact,
-      email,
-      managementAgency: managementAgency?.trim() || '',
-      collaborationType,
-      collaborationPrice: collaborationType === 'paid' ? Number(collaborationPrice) : null
     });
     return res.status(201).json({
       success: true,
