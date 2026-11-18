@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from 'react';
 import api from './services/api';
 import './App.css';
@@ -51,10 +50,8 @@ const initialForm = {
   collaborationPrice: '',
   managementAgency: ''
 };
-
 const isLinkLike = (value) =>
   /(youtube\.com\/(@|channel\/|user\/|c\/))|^@[\w.-]+$|^UC[\w-]{22}$/i.test(value.trim());
-
 function App() {
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
@@ -68,7 +65,6 @@ function App() {
   const [hintError, setHintError] = useState('');
   const nameBoxRef = useRef(null);
   const lastFetchedLink = useRef('');
-
   // Suggest channels while typing a name/username in the YouTube field (debounced)
   useEffect(() => {
     const q = form.youtubeLink.trim();
@@ -97,7 +93,6 @@ function App() {
       clearTimeout(timer);
     };
   }, [form.youtubeLink, form.channels]);
-
   // Auto-load channel stats when a YouTube link is entered
   useEffect(() => {
     const link = form.youtubeLink.trim();
@@ -108,7 +103,6 @@ function App() {
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.youtubeLink, form.channels]);
-
   useEffect(() => {
     const close = (e) => {
       if (nameBoxRef.current && !nameBoxRef.current.contains(e.target)) setHintsOpen(false);
@@ -116,7 +110,6 @@ function App() {
     document.addEventListener('mousedown', close);
     return () => document.removeEventListener('mousedown', close);
   }, []);
-
   const updateField = (e) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
@@ -126,9 +119,7 @@ function App() {
       lastFetchedLink.current = '';
     }
   };
-
   const formatNumber = (n) => (n === null || n === undefined ? 'Hidden' : new Intl.NumberFormat('en-IN', { notation: 'compact', maximumFractionDigits: 1 }).format(n));
-
   const fetchYoutube = async (urlOverride) => {
     const link = (typeof urlOverride === 'string' ? urlOverride : form.youtubeLink).trim();
     if (!link) {
@@ -157,7 +148,6 @@ function App() {
       setYtLoading(false);
     }
   };
-
   const pickYoutubeHint = (hint) => {
     const url = `https://www.youtube.com/channel/${hint.channelId}`;
     setHintsOpen(false);
@@ -169,7 +159,6 @@ function App() {
     }));
     fetchYoutube(url);
   };
-
   const applyYoutubeStats = () => {
     if (!ytChannel) return;
     setForm(prev => ({
@@ -203,12 +192,10 @@ function App() {
       setMessage({ type: 'error', text: 'Please enter the YouTube profile link.' });
       return;
     }
-
     if (form.channels.includes('youtube') && !/^https?:\/\//i.test(form.youtubeLink.trim())) {
       setMessage({ type: 'error', text: 'Pick a channel from the suggestions or paste the full YouTube link.' });
       return;
     }
-
     if (form.channels.includes('instagram') && !form.instagramLink.trim()) {
       setMessage({ type: 'error', text: 'Please enter the Instagram profile link.' });
       return;
@@ -248,25 +235,10 @@ function App() {
       <div className="ambient ambient-orange-two"></div>
       <header className="topbar">
         <a href="/" className="brand">
-          <span className="brand-icon">C</span>
-          <span>CREATOR<span className="brand-accent">HUB</span></span>
+          <span className="brand-icon">U</span>
+          <span>USP<span className="brand-accent">Creators</span></span>
         </a>
-        <div className="topbar-right">
-          <span className="live-dot"></span>
-          <span>CREATOR DATABASE</span>
-        </div>
       </header>
-      <section className="hero-section">
-        <div className="hero-tag">
-          <span className="hero-tag-icon">✳</span>
-          INFLUENCER NETWORK
-        </div>
-        <h1>Build Your <span>Creator</span><br />Network.</h1>
-        <p className="hero-description">
-          Bring creators into your network. Add their social profiles,
-          audience insights and collaboration details in one place.
-        </p>
-      </section>
       <section className="form-section">
         <div className="form-card">
           <div className="form-heading">
@@ -379,9 +351,7 @@ function App() {
                 </div>
               )}
                 <small className="input-note">Type a name to see channel suggestions, or paste a link. Stats load automatically.</small>
-
                 {ytError && <div className="form-alert error inline-alert" role="alert"><span>!</span>{ytError}</div>}
-
                 {ytChannel && (
                   <div className="yt-preview">
                     <div className="yt-head">
