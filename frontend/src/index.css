@@ -19,7 +19,7 @@
   box-sizing: border-box;
 }
 html {
-  min-width: 320px;
+  min-width:320px;
   scroll-behavior: smooth;
 }
 body {
