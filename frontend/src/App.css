@@ -588,7 +588,7 @@ body {
   border: none;
   border-left: 1px solid #ffffff1c;
   border-radius: 0 11px 11px 0;
-  background: linear-gradient(110deg, #d99a70, #c98252);
+  background: linear-gradient(110deg, #ffad42, #ff8c00);
   color: #17100d;
   font-size: 12px;
   font-weight: 800;
@@ -616,16 +616,16 @@ body {
 .yt-title small { color: #8f8580; font-size: 11px; }
 .yt-apply {
   padding: 9px 14px;
-  border: 1px solid #c9825266;
+  border: 1px solid #ff8c0066;
   border-radius: 9px;
-  background: #c9825214;
-  color: #dda982;
+  background: #ff8c0014;
+  color: #ffb866;
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
   transition: .25s;
 }
-.yt-apply:hover { background: #c9825230; }
+.yt-apply:hover { background: #ff8c0030; }
 .yt-stats {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -639,7 +639,7 @@ body {
   background: #ffffff08;
   text-align: center;
 }
-.yt-stats b { display: block; font-size: 17px; color: #d99a70; }
+.yt-stats b { display: block; font-size: 17px; color: #ffad42; }
 .yt-stats span { display: block; margin-top: 4px; font-size: 9px; letter-spacing: .6px; color: #8f8580; }
 .yt-videos {
   display: grid;
@@ -698,7 +698,7 @@ body {
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 1.6px;
-  color: #d99a70;
+  color: #ffad42;
 }
 .hint-item {
   width: 100%;
@@ -715,22 +715,92 @@ body {
   transition: background .2s;
 }
 button.hint-item:hover,
-button.hint-item:focus-visible { background: #c9825220; }
+button.hint-item:focus-visible { background: #ff8c0020; }
 .hint-existing { cursor: default; opacity: .85; }
 .hint-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
-.hint-dot { width: 8px; height: 8px; margin: 0 11px; border-radius: 50%; background: #c98252; flex-shrink: 0; }
+.hint-dot { width: 8px; height: 8px; margin: 0 11px; border-radius: 50%; background: #ff8c00; flex-shrink: 0; }
 .hint-text { flex: 1; min-width: 0; }
 .hint-text strong { display: block; font-size: 12px; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .hint-text small { display: block; margin-top: 2px; font-size: 10px; color: #8f8580; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.hint-pick { font-size: 10px; font-weight: 700; color: #dda982; }
+.hint-pick { font-size: 10px; font-weight: 700; color: #ffb866; }
 
-.link-spinner { margin: 0 16px 0 0; border-color: #d99a7055; border-top-color: #d99a70; }
+.link-spinner { margin: 0 16px 0 0; border-color: #ffad4255; border-top-color: #ffad42; }
 
 .hint-note { padding: 12px 10px; font-size: 11px; line-height: 1.5; color: #a79e99; }
 .hint-note-error { color: #ffaaaa; }
+
+/* ---- Collaboration section polish ---- */
+.collaboration-card { min-height: 74px; }
+.paid-card.selected {
+  border-color: #ff8c00b0;
+  background: linear-gradient(145deg, #ff8c0020, #ff8c000a);
+  box-shadow: 0 0 26px #ff8c0020;
+}
+.unpaid-card.selected {
+  border-color: #64cf8cb0;
+  background: linear-gradient(145deg, #64cf8c1f, #64cf8c0a);
+  box-shadow: 0 0 26px #64cf8c1c;
+}
+.unpaid-card.selected .channel-check { color: #83dfab; }
+.paid-symbol, .unpaid-symbol { font-size: 20px; font-weight: 800; }
+
+.price-input > span {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+  border-radius: 9px;
+  background: #ff8c0022;
+  color: #ffad42;
+  font-size: 15px;
+  font-weight: 800;
+}
+.price-input { padding-left: 11px; }
+.price-input input { font-size: 14px; font-weight: 600; letter-spacing: .3px; }
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+
+/* helper text under labels and fields */
+.field-hint {
+  margin: -4px 0 14px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #9d958f;
+}
+.input-note {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 9px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #9d958f;
+}
+.input-note::before {
+  content: 'i';
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #ffffff30;
+  border-radius: 50%;
+  font-size: 9px;
+  font-style: italic;
+  font-weight: 700;
+  color: #b9b1ab;
+}
 .optional-label {
-  color: #ffad42 !important;
-  font-size: 10px;
-  font-weight: 500;
-  margin-left: 5px;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border: 1px solid #ffffff1f;
+  border-radius: 20px;
+  background: #ffffff0c;
+  color: #a7a09b !important;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .8px;
+  text-transform: uppercase;
 }
