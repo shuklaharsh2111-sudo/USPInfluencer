@@ -1,0 +1,26 @@
+
+import mongoose from 'mongoose';
+
+const influencerSchema = new mongoose.Schema({
+  name: { type: String, required: true, trim: true },
+  channels: {
+    type: [{ type: String, enum: ['youtube', 'instagram'] }],
+    required: true,
+    validate: {
+      validator: (value) => value.length > 0,
+      message: 'Select at least one channel'
+    }
+  },
+  youtubeLink: { type: String, trim: true, default: '' },
+  instagramLink: { type: String, trim: true, default: '' },
+  category: { type: String, required: true, trim: true },
+  location: { type: String, required: true, trim: true },
+  followers: { type: Number, required: true, min: 0 },
+  avgReelViews: { type: Number, required: true, min: 0 },
+  engagement: { type: Number, required: true, min: 0, max: 100 },
+  contact: { type: String, required: true, trim: true },
+  email: { type: String, required: true, trim: true, lowercase: true },
+  managementAgency: { type: String, required: true, trim: true }
+}, { timestamps: true });
+
+export default mongoose.model('Influencer', influencerSchema);
