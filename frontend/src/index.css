@@ -1,37 +1,33 @@
 :root {
-  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  font-family: 'Segoe UI', system-ui, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color-scheme: dark;
-  background: #0F0D0C;
-  color: #FFFFFF;
+  background: #08080d;
+  color: #f8f5f2;
   font-weight: 400;
-  --orange: #F97316;
-  --orange-light: #FDBA74;
-  --orange-dark: #EA580C;
-  --ink: #0F0D0C;
-  --surface: #141110;
-  --surface-light: #181412;
-  --muted: #9CA3AF;
-  --line: rgba(255,255,255,.08);
+  --orange: #c98252;
+  --orange-light: #d99a70;
+  --orange-dark: #a9653d;
+  --ink: #08080d;
+  --surface: #151217;
+  --muted: #a29a96;
 }
 * {
   box-sizing: border-box;
 }
 html {
-  min-width: 320px;
+  min-width:320px;
   scroll-behavior: smooth;
-  background: #0F0D0C;
 }
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: #0F0D0C;
-  color: #FFFFFF;
-  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  background: #08080d;
+  color: #f8f5f2;
 }
 button,
 input,
@@ -39,37 +35,15 @@ select,
 textarea {
   font: inherit;
 }
-button {
-  color: inherit;
-}
 button:focus-visible,
 input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid #F97316;
+select:focus-visible {
+  outline: 2px solid #c98252;
   outline-offset: 3px;
 }
-input::placeholder,
-textarea::placeholder {
-  color: #77716E;
-}
 ::selection {
-  background: rgba(249,115,22,.45);
-  color: #FFFFFF;
-}
-::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
-}
-::-webkit-scrollbar-track {
-  background: #0F0D0C;
-}
-::-webkit-scrollbar-thumb {
-  background: #493023;
-  border-radius: 20px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #F97316;
+  background: #c9825280;
+  color: white;
 }
 #root {
   min-height: 100vh;
