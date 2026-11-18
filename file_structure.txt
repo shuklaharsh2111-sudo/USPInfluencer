@@ -1,3 +1,22 @@
 Get-ChildItem -Recurse -Force -Exclude node_modules | Where-Object { $_.FullName -notmatch '\\node_modules\\' } | ForEach-Object { $_.FullName }
 
 Get-ChildItem -Recurse -Force | Where-Object { $_.FullName -notmatch '\\(node_modules|\.git)(\\|$)' } | ForEach-Object { $_.FullName }
+
+THEME OVERVIEW: Dark Glassmorphism UI with Warm Amber & Burnt-Orange Accents
+
+1. BACKGROUND
+- Base Canvas: Deep matte charcoal/obsidian (#0F0D0C to #12100E) overlaid with a faint, low-opacity architectural grid pattern on the left edge.
+- Ambient Lighting / Glow: Diffused radial gradient glow in burnt orange/rust (#C2410C / #EA580C) radiating from the top-right corner behind the main container.
+
+2. UI SURFACES & CONTAINERS
+- Main Container: Semi-transparent dark frosted glass (rgba(20, 18, 17, 0.75) with backdrop-filter: blur) and a 1px translucent border (rgba(255, 255, 255, 0.08)).
+- Elevated Cards & Controls: High-opacity dark espresso/charcoal surfaces (#141110 / #181412) with 12px-16px rounded corners for KPI cards, search bar, filter dropdowns, and data table.
+
+3. COLOR PALETTE
+- Primary Brand Accent: Vibrant tangerine/orange (#F97316 / #EA580C) for the header badge, avatar, active sort indicators, and low-opacity icon tints (rgba(249, 115, 22, 0.15)).
+- Primary Text: Crisp white (#FFFFFF) for headings, metrics, and primary table values.
+- Secondary Text: Warm muted gray (#9CA3AF) for labels/metadata, and soft warm amber/peach (#FDBA74 / #FB923C) for subtitles and social handles.
+- Semantic Badges: Low-opacity tinted pills — soft red for YouTube (rgba(239, 68, 68, 0.15)), warm amber for category tags, and muted rose/pink for Instagram.
+
+4. TYPOGRAPHY
+- Font Family: Clean geometric sans-serif (e.g., Inter or Plus Jakarta Sans).
